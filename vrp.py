@@ -14,9 +14,9 @@ def main():
 
     if path == "":
         data = create_example()
-
-    with open(path) as f:
-        data = json.load(f)
+    else:
+        with open(path) as f:
+            data = json.load(f)
 
     # Create the routing index manager.
     manager = pywrapcp.RoutingIndexManager(

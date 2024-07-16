@@ -15,7 +15,7 @@ def main():
     path = easygui.fileopenbox()
 
     if path == None:
-        data = create_example()
+        data = create_example(0)
     else:
         with open(path) as f:
             data = json.load(f)
@@ -120,14 +120,21 @@ def main():
 # Graph the solution of this problem
 def graph_solution(data, manager, routing, solution):
     G = nx.DiGraph()
+    colors = ['red', 'green', 'blue', 'black', 'orange', 'purple']  # Add more colors if needed
+
+    # Assign a color to each vehicle
+    vehicle_colors = {vehicle_id: colors[vehicle_id % len(colors)] for vehicle_id in range(data["num_vehicles"])}
+
     for vehicle_id in range(data["num_vehicles"]):
         index = routing.Start(vehicle_id)
         while not routing.IsEnd(index):
             from_node = manager.IndexToNode(index)
             index = solution.Value(routing.NextVar(index))
             to_node = manager.IndexToNode(index)
-            G.add_edge(from_node, to_node)
-    nx.draw(G, with_labels=True, node_size=1000, node_color="skyblue")
+            G.add_edge(from_node, to_node, color=vehicle_colors[vehicle_id])  # Assign color to the edge
+
+    # Draw the graph with colors
+    nx.draw(G, with_labels=True, node_size=1000, edge_color=[G[u][v]['color'] for u, v in G.edges()])
     plt.show()
 
 

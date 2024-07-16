@@ -2,6 +2,8 @@ from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
 import json
 import easygui
+import networkx as nx
+import matplotlib.pyplot as plt
 
 from utils import *
 
@@ -12,7 +14,7 @@ def main():
     
     path = easygui.fileopenbox()
 
-    if path == "":
+    if path == None:
         data = create_example()
     else:
         with open(path) as f:
@@ -111,6 +113,22 @@ def main():
         print_solution(data, manager, routing, solution)
     else:
         print("No solution found !")
+    # Graph the solution
+    graph_solution(data, manager, routing, solution)
+
+
+# Graph the solution of this problem
+def graph_solution(data, manager, routing, solution):
+    G = nx.DiGraph()
+    for vehicle_id in range(data["num_vehicles"]):
+        index = routing.Start(vehicle_id)
+        while not routing.IsEnd(index):
+            from_node = manager.IndexToNode(index)
+            index = solution.Value(routing.NextVar(index))
+            to_node = manager.IndexToNode(index)
+            G.add_edge(from_node, to_node)
+    nx.draw(G, with_labels=True, node_size=1000, node_color="skyblue")
+    plt.show()
 
 
 if __name__ == "__main__":
